@@ -74,6 +74,98 @@ app.get('/login',(req,res)=>{
                 })
         //console.log(req.query)
     })
+//个人资料
+    app.get('/aside',(req,res)=>{
+        //console.log(req.query)
+        res.header('Access-Control-Allow-Origin','*')      
+        mongodb.connect(db_str,(err,database)=>{
+            database.collection('user',(err,coll)=>{
+                coll.find().toArray((err,data)=>{
+                    res.send(data)
+                            //console.log(data)
+                })
+            })
+        })        
+    })
+
+//个人话题
+    app.get('/topic',(req,res)=>{
+        res.header('Access-Control-Allow-Origin','*')         
+        //console.log(req.query);
+        // var current=req.query.current;
+        //console.log(current)
+        var author=req.query.aa;
+        //console.log(author);      
+        mongodb.connect(db_str,(err,database)=>{
+            database.collection('fabu',(err,coll)=>{             
+                    //console.log(datas)
+                    coll.find({author:author}).toArray((err,data)=>{
+                        res.send(data);
+                        database.close()
+                        
+                    }) 
+             
+                
+            
+            })
+        })        
+    })
+
+//个人回复
+app.get('/reply',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')         
+    var username=req.query.aa;
+    //console.log(username);
+    mongodb.connect(db_str,(err,database)=>{
+        database.collection('pinglun',(err,coll)=>{
+            coll.find({username:username}).toArray((err,data)=>{
+              // console.log(data)
+              res.send(data)
+                database.close()
+
+            })
+        })
+    })
+})
+
+
+
+
+//分页
+// app.get('/page',(req,res)=>{
+//     res.header('Access-Control-Allow-Origin','*')
+//     console.log(req.query)
+//     mongodb.connect(db_str,(err,database)=>{
+//         database.collection('fabu',(err,coll)=>{
+//             coll.find({author:author}).limit(5).skip((current-1)*5).toArray((err,data)=>{
+//                 res.send(data)
+//             })
+//         })
+//     })
+// })
+
+
+
+//搜索
+app.get('/search',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    //console.log(req.query.cont)
+    var cont=new RegExp(req.query.cont);
+    mongodb.connect(db_str,(err,database)=>{
+        database.collection('fabu',(err,coll)=>{
+            coll.find({title:cont}).toArray((err,data)=>{
+                res.send(data)
+               // console.log(data)
+                database.close()
+
+            })
+           
+        })
+    })
+
+})
+
+
 
 //列表
     app.get('/getData',(req,res)=>{
