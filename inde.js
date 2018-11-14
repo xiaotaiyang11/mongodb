@@ -32,7 +32,7 @@ app.get('/login',(req,res)=>{
 		
 	})
 	
-	
+//登陆	
     app.get('/register',(req,res)=>{
         res.header('Access-Control-Allow-Origin','*')
         //console.log(req.query)
@@ -51,7 +51,7 @@ app.get('/login',(req,res)=>{
         
     })
     
-
+//重置
     app.get('/reset',(req,res)=>{
         res.header('Access-Control-Allow-Origin','*')
        // var id=req.query.id;
@@ -70,5 +70,128 @@ app.get('/login',(req,res)=>{
                 })
         //console.log(req.query)
     })
+
+
+//发布话题
+app.get('/pinglun',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    var id=ObectId(req.query.keys)
+    mongodb.connect(db_str,(err,database)=>{
+          database.collection('pinglun',(err,coll)=>{
+            if(req.query.dates!='' && req.query.con!=''){
+                  coll.insertOne(req.query,()=>{
+                     res.send('1')
+                     database.collection('fabu',(err,colls)=>{
+                         colls.update({_id:id},{$inc:{num2:1}},()=>{
+
+                         })
+                     })
+                     database.close()
+                   })
+            }else{
+                res.send('0')
+                database.close()
+            }
+        })
+    })
+})
+
+app.get('/getpinglun',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    var keys = req.query.keys;
+    mongodb.connect(db_str,(err,database)=>{
+        database.collection('pinglun',(err,coll)=>{
+            coll.find({keys:keys}).sort({_id:-1}).toArray((err,data)=>{
+                res.send(data);
+                database.close()
+            })
+        })
+    })
+})
+
+//得到排序后的数据
+app.get('/daoxu',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    var keys = req.query.keys;
+    var daoxu = req.query.flag;
+    if(daoxu=='倒序查看'){
+        mongodb.connect(db_str,(err,database)=>{
+            database.collection('pinglun',(err,coll)=>{
+                coll.find({keys:keys}).sort({mytime:-1}).toArray((err,data)=>{
+                    console.log(data)
+                    res.send(data);
+                    database.close()
+                })
+            })
+        })
+    }else{
+        mongodb.connect(db_str,(err,database)=>{
+            database.collection('pinglun',(err,coll)=>{
+                coll.find({keys:keys}).sort({mytime:1}).toArray((err,data)=>{
+                    res.send(data);
+                    database.close()
+                })
+            })
+        })
+    }
+})
+
+//list
+app.get('/getlist',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    mongodb.connect(db_str,(err,database)=>{
+        database.collection('fabu',(err,coll)=>{
+            coll.find().toArray((err,data)=>{
+              res.send(data)
+              database.close()
+            })
+        })
+    })
+})
+
+//详情
+app.get('/getDetail',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    var id = ObectId(req.query.id)
+    mongodb.connect(db_str,(err,database)=>{
+        database.collection('fabu',(err,coll)=>{
+            coll.find({_id:id}).toArray((err,data)=>{
+              res.send(data)
+              database.collection('fabu',(err,colls)=>{
+                    colls.update({_id:id},{$inc:{num1:1}},()=>{
+
+                    })
+                })
+                database.close()
+            })
+        })
+    })
+})
+
+//回复
+app.get('/huipick',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    var id = ObectId(req.query.id)
+    console.log(req.query)
+    mongodb.connect(db_str,(err,database)=>{
+        database.collection('pinglun',(err,coll)=>{
+          if(req.query.dates!='' && req.query.con!=''){
+                coll.insertOne(req.query,()=>{
+                   res.send('1')
+                   database.collection('fabu',(err,colls)=>{
+                       colls.update({_id:id},{$inc:{num2:1}},()=>{
+
+                       })
+                   })
+                   database.close()
+                 })
+          }else{
+              res.send('0')
+              database.close()
+          }
+      })
+  })
+})
+
 
 app.listen(8000)
