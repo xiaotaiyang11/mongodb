@@ -64,11 +64,46 @@ app.get('/login',(req,res)=>{
                     database.collection('user',(err,coll)=>{
                         coll.update({username:username},{$set:{pass:pass}},(err,data)=>{
                             res.send('1')
+                            console.log(data)
                             database.close()
                         })
                     })
                 })
         //console.log(req.query)
     })
+
+//列表
+    app.get('/getData',(req,res)=>{
+        res.header('Access-Control-Allow-Origin','*')
+        mongodb.connect(db_str,(err,database)=>{
+            database.collection('fabu',(err,coll)=>{
+                coll.find().toArray((err,data)=>{
+                    res.send(data)
+                    database.close()
+                })
+            })
+        })       
+    })
+
+
+//发布新话题
+
+app.get('/fabu',(req,res)=>{
+    res.header('Access-Control-Allow-Origin','*')
+    //  console.log(req.query)
+    req.query.num1=parseInt(req.query.num1)
+    req.query.num2=parseInt(req.query.num2)
+    mongodb.connect(db_str,(err,database)=>{
+        database.collection('fabu',(err,coll)=>{
+            coll.save(req.query,()=>{
+                res.send('1')
+                database.close()
+            })
+        })
+    })       
+})
+
+
+
 
 app.listen(8000)
