@@ -5,6 +5,7 @@ var ObectId = require("mongodb").ObjectId
 var db_str = "mongodb://127.0.0.1:27017/zz1805";
 
 var app = express()
+//注册
 app.get('/login',(req,res)=>{
 	res.header('Access-Control-Allow-Origin','*')
 	//console.log(req.query)
@@ -32,7 +33,7 @@ app.get('/login',(req,res)=>{
 		
 	})
 	
-	
+	//登录
     app.get('/register',(req,res)=>{
         res.header('Access-Control-Allow-Origin','*')
         //console.log(req.query)
@@ -41,6 +42,7 @@ app.get('/login',(req,res)=>{
         mongodb.connect(db_str,(err,database)=>{
                     database.collection('user',(err,coll)=>{
                         coll.find({username:username,pass:pass}).toArray((err,data)=>{
+                            console.log(data);
                             if(data.length>0){
                                 res.send('1')
                                 database.close()
@@ -51,7 +53,7 @@ app.get('/login',(req,res)=>{
         
     })
     
-
+//重置密码
     app.get('/reset',(req,res)=>{
         res.header('Access-Control-Allow-Origin','*')
        // var id=req.query.id;
@@ -71,4 +73,29 @@ app.get('/login',(req,res)=>{
         //console.log(req.query)
     })
 
+ //填写资料
+    app.get('/ziliao',(req,res)=>{
+        res.header('Access-Control-Allow-Origin','*')
+        //console.log(req.query)
+        var username=req.query.username;
+        console.log(username)
+        var sex=req.query.sex;
+        console.log(sex);
+        var age=req.query.age;
+        var zuo=req.query.zuo;
+        mongodb.connect(db_str,(err,database)=>{
+                    database.collection('user',(err,coll)=>{
+                           // console.log(data);
+                           coll.find({username:username}).toArray((err,data)=>{
+                            if(data.length>0){
+                                coll.update({username:username},{$set:{sex:sex,age:age,zuo:zuo}},(err,data)=>{
+                                    res.send('1')
+                                    database.close()
+                                })  
+                             }
+                            })
+                    })
+                })
+        
+    })
 app.listen(8000)
