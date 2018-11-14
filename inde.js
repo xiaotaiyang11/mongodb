@@ -131,19 +131,6 @@ app.get('/reply',(req,res)=>{
 
 
 
-//分页
-// app.get('/page',(req,res)=>{
-//     res.header('Access-Control-Allow-Origin','*')
-//     console.log(req.query)
-//     mongodb.connect(db_str,(err,database)=>{
-//         database.collection('fabu',(err,coll)=>{
-//             coll.find({author:author}).limit(5).skip((current-1)*5).toArray((err,data)=>{
-//                 res.send(data)
-//             })
-//         })
-//     })
-// })
-
 
 
 //搜索
